@@ -13,6 +13,7 @@ A Rust crate for working with `miniON`s.
 
     let minion = minion.to_string();
 ```
+Will result in a `String` containing `greeting|13~Hello, world!`.
 
 ## Example parsing `miniON`s
 
@@ -22,6 +23,8 @@ A Rust crate for working with `miniON`s.
     let data = b"greeting|13~Hello, world!container|23~first|3~ONEsecond|3~TWO";
 
     let mut incr: usize = 0;
+
+    // Parse a single object that starts at the position `incr`...
 
     match MiniON::parse_one(data, &mut incr) {
         Ok(minion) => {
@@ -41,9 +44,9 @@ A Rust crate for working with `miniON`s.
         }
     }
 
-    // OR
+    // ... OR parse all (sucessive) miniON objects.
 
-    match Minion::parse_all(data) {
+    match MiniON::parse_all(data) {
         Ok(minions) => {
             assert_eq!(minions.len(),2);
 
