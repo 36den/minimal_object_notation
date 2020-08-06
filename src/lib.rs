@@ -33,7 +33,7 @@ impl MiniON {
     ///     let minion = minion.as_string();
     /// ```
     /// Will give you a `String` containing `"greeting|13~Hello, world!"`.
-    pub fn as_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         let mut output = String::from(&self.name);
         output.push('|');
         output.push_str(&format!("{}",self.length));
@@ -437,7 +437,7 @@ mod tests {
 
         minion.set_content("Hello, world!".to_string());
 
-        assert_eq!("greeting|13~Hello, world!",minion.as_string());
+        assert_eq!("greeting|13~Hello, world!",minion.to_string());
 
     }
 
@@ -454,12 +454,12 @@ mod tests {
 
         pairs_of_socks.set_content("____________________".to_string());
 
-        let mut content = days_of_the_week.as_string();
-        content.push_str(&pairs_of_socks.as_string());
+        let mut content = days_of_the_week.to_string();
+        content.push_str(&pairs_of_socks.to_string());
 
         minion_container.set_content(content);
 
-        assert_eq!("container|60~object|20~____________________object|20~____________________",minion_container.as_string());
+        assert_eq!("container|60~object|20~____________________object|20~____________________",minion_container.to_string());
     }
 
     #[test]
