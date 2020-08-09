@@ -455,7 +455,6 @@ pub enum Error {
     Incomplete(String),
     NoStructure,
     BadStructure(String),
-    NoContent,
     NotFound(String),
 }
 
@@ -471,9 +470,6 @@ impl Error {
             },
             Error::BadStructure(info) => {
                 println!("Error: Bad data: {}",info);
-            },
-            Error::NoContent => {
-                println!("Error: Content of length 0 cannot be parsed.");
             },
             Error::NotFound(name) => {
                 println!("Error: The `miniON` object (name: {}) was not found.",name);
@@ -492,9 +488,6 @@ impl Error {
             },
             Error::BadStructure(info) => {
                 return format!("Error: Bad data: {}",info);
-            },
-            Error::NoContent => {
-                return format!("Error: Content of length 0 cannot be parsed.")
             },
             Error::NotFound(name) => {
                 return format!("Error: The `miniON` object (name: {}) was not found.",name);
