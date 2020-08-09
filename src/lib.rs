@@ -23,14 +23,14 @@ impl MiniON {
 
     /// Return the `MiniON` as a `String`.
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let mut minion = MiniON::new("greeting".to_string());
     /// 
     ///     minion.set_content("Hello, world!".to_string());
     /// 
-    ///     let minion = minion.as_string();
+    ///     let minion = minion.to_string();
     /// ```
     /// Will give you a `String` containing `"greeting|13~Hello, world!"`.
     pub fn to_string(&self) -> String {
@@ -53,7 +53,7 @@ impl MiniON {
 
     /// Parse data into a `MiniON` object.
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let data = b"greeting|13~Hello, world!";
@@ -123,7 +123,7 @@ impl MiniON {
 
     /// Parse data that contains multiple miniON objects ONE AFTER THE OTHER. Will not parse nested miniON objects.
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let data = b"first|4~ONE,second|4~TWO,third|6~THREE,container|29~name|5~NAME,content|7~CONTENT";
@@ -185,9 +185,78 @@ impl MiniON {
         }
     }
 
+    /// Find a specific miniON object by its name.
+    /// ## Example
+    /// ```
+    ///     use minimal_object_notation::*;
+    /// 
+    ///     let data = b"one|3~ONEtwo|3~TWOthree|5~THREE";
+    /// 
+    ///     match MiniON::find(data,"two") {
+    ///         Ok(minion) => {
+    ///             assert_eq!("two",minion.name);
+    ///             assert_eq!(Some("TWO".to_string()),minion.content);
+    ///         },
+    ///         Err(e) => {
+    ///             panic!("{}",e.to_string());
+    ///         }
+    ///     }
+    /// ```
+    pub fn find(bytes: &[u8], name: &str) -> Result<MiniON,Error> {
+
+        let mut incr: usize = 0;
+
+        loop {
+
+            match MiniON::parse_name(bytes, &mut incr) {
+                Ok(nm) => {
+                    match name == nm {
+                        true => {
+                            let mut minion = MiniON::new(name.to_string());
+
+                            match MiniON::parse_length(bytes, &mut incr, name) {
+                                Ok(len) => {
+
+                                    match MiniON::parse_content(bytes, &mut incr, name, len) {
+                                        Ok(content) => {
+                                            minion.set_content(content);
+                                        },
+                                        Err(e) => {
+                                            return Err(e);
+                                        }
+                                    }
+
+                                },
+                                Err(e) => {
+                                    return Err(e);
+                                }
+                            }
+
+                            return Ok(minion);
+                        },
+                        false => {}
+                    }
+                },
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+
+            match MiniON::parse_length(bytes, &mut incr, name) {
+                Ok(len) => {
+                    incr += len;
+                },
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+
+        }
+    }
+
     /// Parse the name of a miniON object. (Start at the correct position.)
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let data = b"greeting|13~Hello, world!";
@@ -241,7 +310,7 @@ impl MiniON {
 
     /// Parse the length of a miniON object (after having parsed the name tag).
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let data = b"greeting|13~Hello, world!";
@@ -317,7 +386,7 @@ impl MiniON {
 
     /// Parse the contents of a miniON object (after having parsed the name and length tags).
     /// ## Example
-    /// ```rust
+    /// ```
     ///     use minimal_object_notation::*;
     /// 
     ///     let data = b"greeting|13~Hello, world!";
@@ -387,6 +456,7 @@ pub enum Error {
     NoStructure,
     BadStructure(String),
     NoContent,
+    NotFound(String),
 }
 
 impl Error {
@@ -397,13 +467,16 @@ impl Error {
                 println!("Error: Incomplete data: {}",info);
             },
             Error::NoStructure => {
-                println!("Error: No structure: The data does not follow the mON structure.")
+                println!("Error: No structure: The data does not follow the mON structure.");
             },
             Error::BadStructure(info) => {
                 println!("Error: Bad data: {}",info);
             },
             Error::NoContent => {
-                println!("Error: Content of length 0 cannot be parsed.")
+                println!("Error: Content of length 0 cannot be parsed.");
+            },
+            Error::NotFound(name) => {
+                println!("Error: The `miniON` object (name: {}) was not found.",name);
             }
         }
     }
@@ -422,6 +495,9 @@ impl Error {
             },
             Error::NoContent => {
                 return format!("Error: Content of length 0 cannot be parsed.")
+            },
+            Error::NotFound(name) => {
+                return format!("Error: The `miniON` object (name: {}) was not found.",name);
             }
         }
     }
@@ -622,6 +698,21 @@ mod tests {
                         panic!("Expected content!");
                     }
                 }
+            },
+            Err(e) => {
+                panic!("{}",e.to_string());
+            }
+        }
+    }
+
+
+    #[test]
+    fn test_find() {
+        let data = b"one|3~ONEtwo|3~TWOthree|5~THREE";
+
+        match MiniON::find(data,"two") {
+            Ok(_) => {
+
             },
             Err(e) => {
                 panic!("{}",e.to_string());
