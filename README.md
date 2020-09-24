@@ -1,6 +1,10 @@
-# Minimal Object Notation (aka. MiniON)
+# Minimal Object Notation
 
 A Rust crate for working with `miniON`s.
+
+## Introduction
+
+What is 'Minimal Object Notation'? It is a format that comes from simply attaching a name tag and a length tag to some information. For example: `greeting|13~Hello, world!`.
 
 ## Example creating `miniON`s
 
