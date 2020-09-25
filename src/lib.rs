@@ -80,7 +80,9 @@ impl MiniON {
     /// 
     /// ```
     pub fn parse_one(bytes: &[u8], incr: &mut usize) -> Result<MiniON,Error> {
+        #[allow(unused_assignments)] // Don't know why it warns me.
         let mut name = String::new();
+        #[allow(unused_assignments)] // Idem.
         let mut length: usize = 0;
         let mut content = String::new();
 
