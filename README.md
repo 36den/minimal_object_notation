@@ -1,6 +1,6 @@
 # Minimal Object Notation
 
-A Rust crate for working with `miniON`s.
+A Rust crate for reading and writing minimimal object notation.
 
 ## Introduction
 
