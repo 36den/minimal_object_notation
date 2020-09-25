@@ -3,6 +3,12 @@ name = "minimal_object_notation"
 version = "0.1.0"
 authors = ["36den"]
 edition = "2018"
+description = "Minimal encoding."
+license = "MIT OR Apache-2.0"
+keywords = ["minimal"]
+categories = ["encoding"]
+repository = "https://github.com/36den/minimal_object_notation"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
